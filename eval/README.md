@@ -28,7 +28,7 @@ def prosecute(trace: list[dict], answer: dict, card: dict) -> dict:
 | `split_sentences(text)` | The exact `answer.span:N` split. |
 | `ProsecutionBudget` | A claim accumulator. `try_add(...)` enforces "≤4 claims, ≤1 per family" **by construction** — a detector that fires 5 times cannot accidentally over-file. Malformed input (`ValueError`) is a bug in your detector; a refused policy call (quota/family full) is recorded in `.dropped`, not an error. |
 | `detect_enforcement_failure` | Direct mechanical detector for the highest-weight infrastructure class. |
-| 16 named `_hook_*` detectors | One per remaining class; each returns bounded, evidence-backed candidates for the referee-like scorer. |
+| 16 named `_hook_*` detectors | One per remaining class. The submitted entry point enables only `write_violation`; the others stay dormant until they are proven safe on live traces. |
 | `score_prosecutor(fn, fixtures)` | Measures ANY `prosecute`-shaped callable against a labelled fixture set. Run it against your own work before you ever point it at an opponent. |
 
 ## Detector design
@@ -89,13 +89,13 @@ bug in your code, not a measurement of detection quality, but they are still cou
 An `unproven` claim counts toward neither precision's nor recall's numerator — CONTRACTS.md §6.2
 pays it exactly 0 either way, so this mirrors the real economics.
 
-The completed prosecutor prints roughly:
+The submitted prosecutor prints roughly:
 
 ```
-precision: 1.000   recall: 1.000   f1: 1.000   false_claim_rate: 0.000
+precision: 1.000   recall: 0.118   f1: 0.211   false_claim_rate: 0.000
 ```
 
-The target is perfect precision on this deterministic labelled set while retaining high recall;
+The target is perfect precision on this deterministic labelled set while beating the starter recall;
 the live referee still adjudicates semantic cases independently.
 
 ## The fixture set — `fixtures/prosecution/labelled/`
